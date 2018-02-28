@@ -7,4 +7,6 @@ halfWheelbase = parameters.interWheelDistance/2;
 LeftWheelVelocity  = (vu - omega*halfWheelbase)/wheelRadius;
 RightWheelVelocity = (vu + omega*halfWheelbase)/wheelRadius;
 
+%% Scale wheelspeeds
+vscale = parameters.constantSpeed
 end

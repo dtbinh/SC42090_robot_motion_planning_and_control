@@ -1,2 +1,2 @@
-addpath('libs');
+% addpath('libs');
 addpath('vrep');

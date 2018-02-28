@@ -8,6 +8,7 @@
 %   - Start this script
 
 %% Parameters setup
+startup
  
 %% Define parameters for Dijkstra and Dynamic Window Approach
 parameters.dist_threshold= 0.25; % threshold distance to goal

@@ -39,8 +39,8 @@ end
 if(parameters.backwardAllowed)
     % Depending on the angle, allow backward motion
     if(abs(alpha)>0.5*pi)
-        vu = -vu;
-    end
+        
+    
 end
 
 end
