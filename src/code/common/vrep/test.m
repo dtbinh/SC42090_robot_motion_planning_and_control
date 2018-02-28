@@ -1,3 +1,4 @@
+startup
 % Make sure to have the simulation scene mooc_exercise.ttt opened in V-REP!
 
 % simulation setup, will add the matlab paths

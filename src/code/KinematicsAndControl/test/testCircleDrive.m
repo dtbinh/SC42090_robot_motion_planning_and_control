@@ -5,6 +5,7 @@
 
 more off;
 close all
+startup
 
 %% Test parameters
 vu = 1.0;

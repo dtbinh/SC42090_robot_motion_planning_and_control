@@ -1,0 +1,2 @@
+addpath('libs');
+addpath('vrep');

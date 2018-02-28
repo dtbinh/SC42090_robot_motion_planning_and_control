@@ -25,7 +25,7 @@ alpha = normalizeAngle(alpha);
 % parameters.useConstantSpeed: Turn on constant speed option
 % parameters.constantSpeed: The speed used when constant speed option is on
 
-vu = TODO; % [m/s]
+vu    = TODO; % [m/s]
 omega = TODO; % [rad/s]
 
 end
