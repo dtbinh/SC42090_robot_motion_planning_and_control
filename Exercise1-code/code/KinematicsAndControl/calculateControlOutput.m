@@ -25,23 +25,8 @@ alpha = normalizeAngle(alpha);
 % parameters.useConstantSpeed: Turn on constant speed option
 % parameters.constantSpeed: The speed used when constant speed option is on
 
-beta  = -lambda + thetag;
-vu    = parameters.Krho * rho; % [m/s]
-omega = parameters.Kalpha*alpha + parameters.Kbeta*beta; % [rad/s]
-
-if(parameters.useConstantSpeed)
-    % Scale vu and omega
-    vscale  = parameters.constantSpeed/vu;
-    vu      = vu*vscale;
-    omega   = omega*vscale;
-end
-
-if(parameters.backwardAllowed)
-    % Depending on the angle, allow backward motion
-    if(abs(alpha)>0.5*pi)
-        
-    
-end
+vu = TODO; % [m/s]
+omega = TODO; % [rad/s]
 
 end
 

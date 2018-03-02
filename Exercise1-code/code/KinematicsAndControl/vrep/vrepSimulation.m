@@ -8,7 +8,6 @@
 %   - Start this script
 
 %% Parameters setup
-startup
  
 %% Define parameters for Dijkstra and Dynamic Window Approach
 parameters.dist_threshold= 0.25; % threshold distance to goal
@@ -39,14 +38,9 @@ parameters.constantSpeed = 0.4;
 bob_setTargetGhostPose(connection, -1, 0, 0);
 bob_setTargetGhostVisible(connection, 1);
 
-% Assertion for stability
-assert(parameters.Kalpha+5/3*parameters.Kbeta-2/pi*parameters.Krho>0);
 
 %% CONTROL LOOP.
 EndCond = 0;
-
-counter = 1;
-clear x_dat y_dat theta_dat v_dat
 
 while (~EndCond)
     %% CONTROL STEP.
@@ -68,13 +62,6 @@ while (~EndCond)
     
     % SET ROBOT WHEEL SPEEDS.
     bob_setWheelSpeeds(connection, LeftWheelVelocity, RightWheelVelocity);
-    
-    %% Save data
-    x_dat(counter) = x;
-    y_dat(counter) = y;
-    theta_dat(counter) = theta;
-    vu_dat(counter) = vu;
-    counter = counter + 1;
 end
 
 %% Bring Bob to standstill
