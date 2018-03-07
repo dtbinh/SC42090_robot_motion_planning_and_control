@@ -34,7 +34,7 @@ mapSize = size(dilatedMap);
 
 % We compute the distance to the goal at every cell in the map. We start
 % from the goal.
-costs(goalIdx(1), goalIdx(2)) = TODO;
+costs(goalIdx(1), goalIdx(2)) = 0; %% TODO. Distance to goal from goal is zero
 firstNode.f = costs(goalIdx(1), goalIdx(2));
 firstNode.idx = goalIdx;
 heap = {firstNode};                     % push start node onto heap
@@ -47,7 +47,7 @@ msgLength = 0;
 
 
 % Insert a suitable termination criterion here
-while TODO
+while ~isempty(heap) % TODO
     if (numel(heap) > maxHeapSize)
         maxHeapSize = numel(heap);
     end
@@ -151,18 +151,18 @@ function nodes = expandNode(node, connectivity)
 
 % Compute the children for the 4-connectivity
 nodes = cell(connectivity, 1);
-nodes{1} = TODO
-nodes{2} = TODO
-nodes{3} = TODO
-nodes{4} = TODO
+nodes{1} = node + [0,1];
+nodes{2} = node + [1,0];
+nodes{3} = node - [0,1];
+nodes{4} = node - [1,0];
 
 % Compute the children for the 8-connectivity. The children for the
 % 4-connectivity are a subset of these.
 if (connectivity > 4)
-    nodes{5} = TODO
-    nodes{6} = TODO
-    nodes{7} = TODO
-    nodes{8} = TODO
+    nodes{5} = node + [ 1, 1];
+    nodes{6} = node + [ 1,-1];
+    nodes{7} = node + [-1,-1];
+    nodes{8} = node + [-1, 1];
 end
 
 end
@@ -173,7 +173,7 @@ function cost = computeCost(dilatedMap, cell1, cell2)
 % nodes.
 
     if (dilatedMap(cell2(1), cell2(2)) ~= -1)
-        cost = TODO
+        cost = norm(cell1-cell2);
     else
         cost = inf; % in collision
     end
@@ -197,7 +197,7 @@ gx(end,:) = costs(end-1,:) - costs(end,:);
 gy(:,1) = costs(:,1) - costs(:,2);
 gy(:,end) = costs(:,end-1) - costs(:,end);
 
-costGradientDirection = TODO
+costGradientDirection = (gx.^2+gy.^2)^0.5 %TODO
 end
 
 function path = extractBestCostPath(costs, startIdx, goalIdx, connectivity)
@@ -214,7 +214,7 @@ path = [path; idx];
 
 % At every step, go to the predecessor of the current node, that has the
 % minimum cost until a suitable termination condition is met.
-while TODO
+while idx ~= goalIdx % TODO
 
     % Get all the predecessors of this node
     nodes = expandNode(idx, connectivity);
@@ -226,8 +226,8 @@ while TODO
     for i=1:numel(nodes)
 
         if ~(any(nodes{i} > mapSize) ||any(nodes{i} < 1)) && costs(nodes{i}(1), nodes{i}(2)) < minCost
-            minCost = TODO
-            minCostIdx = TODO
+            minCost = costs(nodes{i}(1), nodes{i}(2)); % TODO
+            minCostIdx = i; % TODO
             predecessorFound = true;
         end
     end
@@ -239,8 +239,8 @@ while TODO
     end
 
     % Insert the predecessor into the final path
-    idx = minCostIdx;
-    path = TODO
+    idx = nodes{minCostIdx};
+    path = [path;nodes{minCostIdx}];
 end
 
 end
