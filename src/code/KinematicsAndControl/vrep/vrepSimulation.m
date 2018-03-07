@@ -33,7 +33,7 @@ parameters.Krho = 0.5;
 parameters.Kalpha = 1.5;
 parameters.Kbeta = -0.6;
 parameters.backwardAllowed = true;
-parameters.useConstantSpeed = true;
+parameters.useConstantSpeed = false;
 parameters.constantSpeed = 0.4;
 
 bob_setTargetGhostPose(connection, -1, 0, 0);
@@ -46,7 +46,7 @@ assert(parameters.Kalpha+5/3*parameters.Kbeta-2/pi*parameters.Krho>0);
 EndCond = 0;
 
 counter = 1;
-clear x_dat y_dat theta_dat v_dat
+clear x_dat y_dat theta_dat vu_dat
 
 while (~EndCond)
     %% CONTROL STEP.

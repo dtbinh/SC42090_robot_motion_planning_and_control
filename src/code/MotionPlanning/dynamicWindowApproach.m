@@ -189,7 +189,9 @@ else
         % headingTermsNormalized = values of heading(v,omega)
         % distTermsNormalized = values of dist(v,omega)
         % velTermsNormalized = values of vel(v,omega)
-        scores = TODO
+        scores = parameters.headingScoring*headingTermsNormalized + ...
+            parameters.obstacleDistanceScoring*distTermsNormalized + ...
+            parameters.velocityScoring*velTermsNormalized;
 
         
         % Apply smoothing kernel
@@ -267,10 +269,10 @@ function [minVel, maxVel, minOmega, maxOmega] = computeDynamicWindow(robotState,
 
     %TASK (Ex. 2.1): Compute the dynamic window. Hint: pay attention to the
     %absolute maximum and minimum velocities of the robot!
-    maxVel = TODO
-    minVel = TODO
-    maxOmega = TODO
-    minOmega = TODO
+    maxVel = min(parameters.maxVel,robotState.vel+parameters.timestep*parameters.maxAcc);
+    minVel = max(-parameters.maxVel,robotState.vel-parameters.timestep*parameters.maxAcc);
+    maxOmega = min(parameters.maxOmega,robotState.omega+parameters.timestep*parameters.maxOmegaDot);
+    minOmega = max(-parameters.maxOmega,robotState.omega-parameters.timestep*parameters.maxOmegaDot);
 
 end
 
@@ -356,7 +358,8 @@ function [headingTerm, distTerm, velTerm] = scoreTrajectory(trajectory, nStepsBr
             
             % TASK (Ex. 2.1): Compute the value of the function heading(v,omega).
             % Hint: use angleDiff(angle1, angle2) instead of angle1-angle2
-            headingTerm = TODO
+            heading_shortest_path = atan2(goalPosition.y-robotStopPose.y,goalPosition.x-robotStopPose.x);
+            headingTerm = pi-abs(angleDiff(robotStopPose.heading,heading_shortest_path));
             
         else
             % Compute the difference between the cost gradient orientation and 

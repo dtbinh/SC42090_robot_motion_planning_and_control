@@ -3,6 +3,7 @@ ii               = 2;
 x_struct{ii}     = x_dat;
 y_struct{ii}     = y_dat;
 theta_struct{ii} = theta_dat;
+vu_struct{ii}    = vu_dat;
 
 % %% Alpha
 % for jj = 1:ii
@@ -69,3 +70,14 @@ ylabel('y [m]');
 legend('const\_vel = true','const\_vel = false','Start','Location','NorthWest');
 % xlim([-1.5,0.5]);
 % ylim([-2.5,0.5]);
+
+%% Velocity plot
+close all
+plot(vu_struct{1},'LineWidth',2); hold on;
+plot(vu_struct{2},'LineWidth',2)
+% ylim([0,0.5])
+xlabel('Simulation step [-]');
+ylabel('Velocity');
+title('Velocity over time');
+legend('Constant speed = true','Constant speed = false'); 
+print -depsc2 'figures/vel.eps'
