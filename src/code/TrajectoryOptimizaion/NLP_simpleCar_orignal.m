@@ -1,7 +1,3 @@
-clear
-clc
-addpath('FORCES_client');
-
 % Example script for getting started with FORCES NLP solver.
 %
 %--------------------------------------------------------------------------
@@ -56,7 +52,7 @@ model.nh = 2;            % number of inequality constraint functions
 %% Objective function (Ex. 3.1)
 % In this example, we want to maximize position in y direction,
 % with some penalties on the inputs F and s:
-model.objective = @(z) -100*z(4)+0.1*z(1)^2+0.01*z(2)^2; 
+model.objective = @(z) TODO
 
 % You can use standard Matlab handles to define these functions, i.e. you
 % could also have this in a separate file. We use anonymous handles here
@@ -67,9 +63,9 @@ model.objective = @(z) -100*z(4)+0.1*z(1)^2+0.01*z(2)^2;
 m=0.9; L=0.12; % physical constants of the model
 integrator_stepsize = 0.1;
 continuous_dynamics = @(x,u) [x(3)*cos(x(4));  % v*cos(theta)
-                              x(3)*sin(x(4));  % v*sin(theta)
-                              u(1)/m;          % F/m
-                              x(3)*u(2)/L];    % v*s/L
+                              TODO             % v*sin(theta)
+                              TODO             % F/m
+                              TODO ];          % v*s/L
 model.eq = @(z) RK4( z(3:6), z(1:2), continuous_dynamics, integrator_stepsize);
 
 % Indices on LHS of dynamical constraint - for efficiency reasons, make
@@ -79,27 +75,27 @@ model.E = [zeros(4,2), eye(4)];
 %% Inequality constraints (Ex. 3.3)
 % upper/lower variable bounds lb <= z <= ub
 %            inputs    |        states
-%             F     , s     , x     ,y      ,v      ,theta
-model.lb = [ -5     ,-1     ,-3     ,0      ,0      ,0];
-model.ub = [  5     , 1     , 0     ,3      ,2      ,pi];
+%             F    s       x     y     v    theta
+model.lb = [ TODO                                  ];
+model.ub = [ TODO                                  ];
 
 % General (differentiable) nonlinear inequalities hl <= h(z) <= hu
-model.ineq = @(z) [ z(3)^2 + z(4)^2
-                    (z(3) + 2)^2 + (z(4)- 2.5)^2 ];
+model.ineq = @(z) [ TODO
+                    TODO ];
                 
 % Upper/lower bounds for inequalities
-model.hl = [ 1, 1 ]';
-model.hu = [ 9, +inf ]';
+model.hl = [ TODO ]';
+model.hu = [ TODO ]';
 
 %% Initial and final conditions (Ex. 3.4)
 
 % Initial condition on vehicle states
-model.xinit = [-2.5, 0, 0, 3/4*pi].';
-model.xinitidx = 3:6; % use this to specify on which variables initial conditions are imposed
+model.xinit = TODO
+model.xinitidx = TODO % use this to specify on which variables initial conditions are imposed
 
 % Final condition on vehicle velocity and heading angle
-model.xfinal = [0,0].';
-model.xfinalidx = 5:6; % use this to specify on which variables final conditions are imposed
+model.xfinal = TODO
+model.xfinalidx = TODO % use this to specify on which variables final conditions are imposed
 
 
 %% Define solver options
@@ -109,7 +105,6 @@ codeoptions.maxit = 200;    % Maximum number of iterations
 codeoptions.printlevel = 2; % Use printlevel = 2 to print progress (but not for timings)
 codeoptions.optlevel = 0; % 2: optimize for speed
 codeoptions.cleanup = 0;
-codeoptions.nlp.lightCasadi = 1;
 
 %% Generate forces solver
 FORCES_NLP(model, codeoptions);
