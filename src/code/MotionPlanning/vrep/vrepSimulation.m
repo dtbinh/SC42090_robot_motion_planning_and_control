@@ -27,9 +27,11 @@ parameters.simTime = 5.0;
 parameters.timestep = 2*parameters.vrepTimeStep; 
 parameters.nVelSamples = 11;        % should be uneven
 parameters.nOmegaSamples = 11;      % should be uneven
+
 parameters.headingScoring = 0.1;
-parameters.velocityScoring = 0.8;
-parameters.obstacleDistanceScoring = 0.3;
+parameters.velocityScoring = 0.55;
+parameters.obstacleDistanceScoring = 0.35;
+
 parameters.maxVel = 0.2;
 parameters.maxOmega = pi;
 parameters.maxAcc = 1.0;
@@ -40,7 +42,7 @@ parameters.goalBrakingDistance = 0.5;
 parameters.objectiveFcnSmoothingKernel = fspecial('gaussian', [3,3], 1.0);
 parameters.globalPlanningOn = true; % use Global Dynamic Window Approach
 parameters.safetyMargin = 0.1;      % make the robot bigger by this size to keep a safety margin due to delays and inaccuracies when modeling the dynamic constraints
-parameters.vrepSteppedSimulation = true;
+parameters.vrepSteppedSimulation = false;
 
 %% Initialize connection with V-Rep
 connection = simulation_setup();
@@ -124,7 +126,8 @@ nSpeedZeroCnt = 0; % Let's count the number of successive zero robot speeds to d
 robotIsStuck = 0;
 handles = [];
 
-
+clear state_hist
+state_hist = [];
 while goalDistance > 0.1
 
     % get robot pose (x,y,gamma), where positions are in meter, orientation in degrees (non-blocking function):
@@ -147,6 +150,7 @@ while goalDistance > 0.1
     robotState.y = tmp;
     robotState.heading = mod(robotState.heading + pi/2, 2*pi);
 
+    state_hist = [state_hist;[robotState.x,robotState.y]];
     % Call DWA
     [ v, omega, debug ] = dynamicWindowApproach( robotState, goalPosition, localMap, parameters, costGradientDirectionMap );
     

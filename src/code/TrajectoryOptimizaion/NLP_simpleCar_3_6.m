@@ -48,25 +48,23 @@ rad2deg = @(x) x/pi*180;
 deg2rad = @(x) x/180*pi;
 
 %% Problem dimensions
-model.N = 100;            % horizon length
-model.nvar = 6;          % number of variables
-model.neq  = 4;          % number of equality constraints
-model.nh = 2;            % number of inequality constraint functions
+model.N     = 50;        % horizon length
+model.nvar  = 6;          % number of variables
+model.neq   = 4;          % number of equality constraints
+model.nh    = 2;          % number of inequality constraint functions
 
 %% Objective function (Ex. 3.1)
 % In this example, we want to maximize position in y direction,
 % with some penalties on the inputs F and s:
-% costs = [100,0.1,0.01];
-% costs = [50,0.1,0.01];
-% costs = [10,0.2,0.01];
-% costs = [2,0.2,0.01];
-costs = [0.5,0.2,0.01];
-% costs = [0.2,0.2,0.01];
-% costs = [0.2,0.2,0.02];
-% costs = [0.2,0.2,0.05];
-% costs = [0.2,0.2,0.1];
-% costs = [0.2,0.2,0.5];
-model.objective = @(z) -costs(1)*z(4)+costs(2)*z(1)^2+costs(3)*z(2)^2; 
+
+costs = [100,1,1];
+
+xf = -0.2;
+yf =  2.8;
+% cost function is the absolute distance to the goal,
+% x and y are equally weighted
+% TODO: add velocity term and input costs
+model.objective = @(z) costs(1)*((z(3)-xf)^2+(z(4)-yf)^2) + costs(2)*z(1)^2 + costs(3)*z(2)^2; 
 
 % You can use standard Matlab handles to define these functions, i.e. you
 % could also have this in a separate file. We use anonymous handles here
@@ -90,23 +88,22 @@ model.E = [zeros(4,2), eye(4)];
 % upper/lower variable bounds lb <= z <= ub
 %            inputs    |        states
 %             F     , s     , x     ,y      ,v      ,theta
-model.lb = [ -5     ,-1     ,-3     ,0      ,0      ,0];
+model.lb = [ -5     ,-1     ,-3     ,0      ,0      ,-pi];
 model.ub = [  5     , 1     , 0     ,3      ,2      ,pi];
 
 % General (differentiable) nonlinear inequalities hl <= h(z) <= hu
-% model.ineq = @(z) [ z(3)^2 + z(4)^2
-%                     (z(3) + 2)^2 + (z(4)- 2.5)^2 ];
-
-model.ineq = @(z) [ z(3)^2 + z(4)^2
-                    (z(3) + 2)^10 + (z(4)- 2.5)^10 ];
+a1 = -0.8;    b1 = 2.5;   p1 = 2;
+a2 = -1.5;  b2 = 1;     p2 = 20;
+model.ineq = @(z) [ (z(3) - a1)^p1 + (z(4)- b1)^p1
+                    (z(3) - a2)^p2 + (z(4)- b2)^p2 ];
 % Upper/lower bounds for inequalities
-model.hl = [ 1, 1 ]';
-model.hu = [ 9, +inf ]';
+model.hl = [ 0.05, 1 ]';
+model.hu = [ +inf, +inf ]';
 
 %% Initial and final conditions (Ex. 3.4)
 
 % Initial condition on vehicle states
-model.xinit = [-2.5, 0, 0, 3/4*pi].';
+model.xinit = [-2.7, 0.5, 0, 3/4*pi].';
 model.xinitidx = 3:6; % use this to specify on which variables initial conditions are imposed
 
 % Final condition on vehicle velocity and heading angle
@@ -121,7 +118,7 @@ codeoptions.maxit = 2e3;    % Maximum number of iterations
 codeoptions.printlevel = 2; % Use printlevel = 2 to print progress (but not for timings)
 codeoptions.optlevel = 0; % 2: optimize for speed
 codeoptions.cleanup = 0;
-codeoptions.nlp.lightCasadi = 1;
+% codeoptions.nlp.lightCasadi = 1;
 
 %% Generate forces solver
 FORCES_NLP(model, codeoptions);
@@ -145,23 +142,60 @@ problem.all_parameters = [5; 10];
 assert(exitflag == 1,'Some problem in FORCES solver');
 fprintf('\nFORCES took %d iterations and %f seconds to solve the problem.\n',info.it,info.solvetime);
 
+%% Plot custom constraints
+close all
+% square
+a  = -1.5;
+b  = 1;
+p  = 20;% 20 norm creates a rounded square, p-> infinity -> perfect square
+x  = -3:0.01:0;
+y1 = b+(1-(x-a).^p).^(1/p);
+y2 = b-(1-(x-a).^p).^(1/p);
+slice = real(y1) == y1;
+plot(x(slice),y1(slice),'-r','LineWidth',2); hold on;
+plot(x(slice),y2(slice),'-r','LineWidth',2);
+xlim([-3,0]);
+ylim([0,3]);
+
+% Circle
+a  = -0.8;
+b  = 2.5;
+p  = 2;
+r  = 0.05^0.5;
+y1 = b+(r^2-(x-a).^p).^(1/p);
+y2 = b-(r^2-(x-a).^p).^(1/p);
+slice = real(y1) == y1;
+
+
+rectangle('Position',[a-r, b-r, 2*r, 2*r],'Curvature',[1 1],'EdgeColor','r','LineStyle','-','LineWidth',2);
+axis square;
+title('position'); xlim([-3 0]); ylim([0 3]); xlabel('x position'); ylabel('y position');
+
+
+% plot(x(slice),y1(slice),'-r'); hold on;
+% plot(x(slice),y2(slice),'-r');
+
+print -depsc2 'figures/world.eps'
+
 %% Plot results
 TEMP = zeros(model.nvar,model.N);
 for i=1:model.N
-    TEMP(:,i) = output.(['x',sprintf('%03d',i)]);
-    
+    try
+        TEMP(:,i) = output.(['x',sprintf('%02d',i)]);
+    catch
+        TEMP(:,i) = output.(['x',sprintf('%03d',i)]);
+    end    
 end
 U = TEMP(1:2,:);
 X = TEMP(3:6,:);
 
 % plot trajectory
-figure(1); clf;
-plot(X(1,:),X(2,:),'b-'); hold on; 
-rectangle('Position',[-sqrt(model.hl(1)) -sqrt(model.hl(1)) 2*sqrt(model.hl(1)) 2*sqrt(model.hl(1))],'Curvature',[1 1],'EdgeColor','r','LineStyle',':','LineWidth',2);
-rectangle('Position',[-sqrt(model.hu(1)) -sqrt(model.hu(1)) 2*sqrt(model.hu(1)) 2*sqrt(model.hu(1))],'Curvature',[1 1],'EdgeColor','r','LineStyle',':','LineWidth',2);
-rectangle('Position',[-2-sqrt(model.hl(2)) 2.5-sqrt(model.hl(2)) 2*sqrt(model.hl(2)) 2*sqrt(model.hl(2))],'Curvature',[1 1],'EdgeColor','r','LineStyle',':','LineWidth',2);
+plot(X(1,:),X(2,:),'b-','LineWidth',3); hold on; 
+
 plot(model.xinit(1),model.xinit(2),'bx','LineWidth',3); 
-title('position'); xlim([-3 0]); ylim([0 3]); xlabel('x position'); ylabel('y position');
+plot(X(1,end),X(2,end),'rx','LineWidth',3); 
+
+print -depsc2 'figures/world_res.eps'
 
 % plot heading angle and velocity variables
 figure(2); clf;
@@ -180,16 +214,3 @@ plot([1 model.N], [model.lb(1) model.lb(1)]', 'r:');
 subplot(2,1,2); stairs(U(2,:)); grid on; title('delta steering'); hold on; 
 plot([1 model.N], [model.ub(2) model.ub(2)]', 'r:');
 plot([1 model.N], [model.lb(2) model.lb(2)]', 'r:');
-
-%% Print performance indicators
-% X = [x,y,v,theta]
-% U = [F,s]
-Fmin = min(U(1,:));
-Fmax = max(U(1,:));
-Smin = min(U(2,:));
-Smax = max(U(2,:));
-Vmax = max(X(3,:));
-Tmax = max(X(4,:));
-Ttot = find(X(3,2:end)<=1e-3,1,'first');
-
-fprintf("%1.2f&%1.2f&%1.2f&%1.2f&%1.2f&%1.2f&%1.2f&%1.2f&%1.2f&%1.2d\r",costs(1),costs(2),costs(3),Fmin,Fmax,Smin,Smax,Vmax,Tmax,Ttot+1)

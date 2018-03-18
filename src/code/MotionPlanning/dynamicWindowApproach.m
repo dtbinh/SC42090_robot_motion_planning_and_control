@@ -373,7 +373,7 @@ function [headingTerm, distTerm, velTerm] = scoreTrajectory(trajectory, nStepsBr
                 else       
                     % TASK (Ex. 2.3): Compute the heading term for the case where
                     % we incorporate the global navigation function.
-                    % headingTerm = TODO
+                    headingTerm = pi-abs(angleDiff(robotStopPose.heading,gradientDirection)); % TODO
                     
                 end
             end

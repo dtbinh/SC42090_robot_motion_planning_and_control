@@ -197,7 +197,7 @@ gx(end,:) = costs(end-1,:) - costs(end,:);
 gy(:,1) = costs(:,1) - costs(:,2);
 gy(:,end) = costs(:,end-1) - costs(:,end);
 
-costGradientDirection = (gx.^2+gy.^2)^0.5 %TODO
+costGradientDirection = atan2(gy,gx); %TODO
 end
 
 function path = extractBestCostPath(costs, startIdx, goalIdx, connectivity)
@@ -214,7 +214,7 @@ path = [path; idx];
 
 % At every step, go to the predecessor of the current node, that has the
 % minimum cost until a suitable termination condition is met.
-while idx ~= goalIdx % TODO
+while ~all(idx == goalIdx) % TODO
 
     % Get all the predecessors of this node
     nodes = expandNode(idx, connectivity);
