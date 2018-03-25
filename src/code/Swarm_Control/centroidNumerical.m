@@ -1,4 +1,4 @@
-function [Mv, Lv, phiFcn] = centroidNumerical(V, p, massFcn, par)
+function [Mv, Lv, phiFcn] = centroidNumerical(V, massFcn, par)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
