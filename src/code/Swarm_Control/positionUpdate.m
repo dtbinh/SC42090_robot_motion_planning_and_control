@@ -1,2 +1,2 @@
 function posNew = positionUpdate(posOld, u, par)
-TODO
+posNew = posOld+u*par.dt;

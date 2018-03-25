@@ -35,7 +35,7 @@ N = I(2:n+1); % indices of neighbors in P0
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Start with whole region Q
-V0 = par.boudary; % Convex boundary
+V0 = par.boundary; % Convex boundary
 l = length(V0(:,1));
 V0 = [V0; V0(1,:)];
 Lines = zeros(l,3);

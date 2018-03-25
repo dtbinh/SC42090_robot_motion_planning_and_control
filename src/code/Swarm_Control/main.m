@@ -22,7 +22,7 @@ ms = options.ms;
 fs = options.ms;
 
 % parameters
-par = struct('boudary', [0 0;0 1;1 1;1 0],...   % field boudary
+par = struct('boundary', [0 0;0 1;1 1;1 0],...   % field boundary
              'N',       50,...          % numer of agents
              'res',     10,...          % centroid calulation resolution
              'dt',      0.1);           % time step [s]
@@ -31,10 +31,10 @@ N = par.N;
 patternTime = 2; % duration per goal pattern
 
 % derived constants
-xlb = min(par.boudary(:,1));
-xub = max(par.boudary(:,1));
-ylb = min(par.boudary(:,2));
-yub = max(par.boudary(:,2));
+xlb = min(par.boundary(:,1));
+xub = max(par.boundary(:,1));
+ylb = min(par.boundary(:,2));
+yub = max(par.boundary(:,2));
 
 % initial conditions
 rng('shuffle', 'twister');
