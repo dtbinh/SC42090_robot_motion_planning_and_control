@@ -38,5 +38,10 @@ switch densType
     case 3 % Ellipse in 3D
         phi = exp(-alpha*(beta(1)*(x - gamma(:,1)).^2 + beta(2)*(y - gamma(:,2)).^2 - delta^2).^2);
 
+    case 4 % Stars
+        h =  imageMassDensity('stars.mat');
 end
-h = matlabFunction(phi,'vars',{x,y});
+
+if(densType == 0 | densType == 1| densType == 2| densType == 3)
+    h = matlabFunction(phi,'vars',{x,y});
+end

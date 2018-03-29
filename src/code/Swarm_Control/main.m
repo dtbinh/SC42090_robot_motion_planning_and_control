@@ -11,6 +11,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Preparation
+clear all
+close all
+
 % options
 options = struct('animation',   1,...   % show animation
                  'plot',        1,...   % show plots
@@ -23,9 +26,14 @@ fs = options.ms;
 
 % parameters
 par = struct('boundary', [0 0;0 1;1 1;1 0],...   % field boundary
-             'N',       50,...          % numer of agents
-             'res',     10,...          % centroid calulation resolution
-             'dt',      0.1);           % time step [s]
+             'N',           50,...       % numer of agents
+             'res',         10,...       % centroid calulation resolution
+             'dt',          0.1,...      % time step [s]
+             'diffDrive',   true ,...    % Holonomic dynamcis (false) vs. differential Drive dynamics (true)
+             'krho',        1,...      % Distance gain
+             'kalpha',      1,...        % Gain on alpha
+             'useConstantSpeed', true,...% Constant speed true/false
+             'constantSpeed', 0.1);        % Desired constant speed
 N = par.N;
 
 patternTime = 2; % duration per goal pattern
@@ -38,53 +46,92 @@ yub = max(par.boundary(:,2));
 
 % initial conditions
 rng('shuffle', 'twister');
-y0 = rand(2*N,1);
+if(par.diffDrive == false)
+    s0 = rand(2*N,1); % x, y
+else
+    s0 = rand(3*N,1); % x, y, phi 
+%     s0(3:3:3*N) = s0(3:3:3*N)*2*pi;
+end
 
 %% Pattern control
-zeroMass = cell(5,1);
+quick = false;
+if(exist('main.mat')==0 && quick==false)
+    zeroMass = cell(5,1);
 
-disp('Computing pattern 1 ...')
-pattern1 = simpleMassDistribution(1,   6.0e5, 0.05, 0.5, 1);
-[t1,y1,dens1,zm1] = Lloyd(pattern1, y0, [0 patternTime], par);
-zeroMass{1} = zm1;
+    disp('Computing pattern 1 ...')
+    pattern1 = simpleMassDistribution(1,   6.0e5, 0.05, 0.5, 1);
+    [t1,s1,dens1,zm1] = Lloyd(pattern1, s0, [0 patternTime], par);
+    zeroMass{1} = zm1;
+    
+    disp('Computing pattern 2 ...')
+    pattern2 = simpleMassDistribution(3,   1.0e6, [0.1 0.1], [0.5 0.5], 0.1);
+    [t2,s2,dens2,zm2] = Lloyd(pattern2, s1(:,end), [t1(end) 2*patternTime], par);
+    zeroMass{2} = zm2;
 
-disp('Computing pattern 2 ...')
-pattern2 = simpleMassDistribution(3,   1.0e6, [0.1 0.1], [0.5 0.5], 0.1);
-[t2,y2,dens2,zm2] = Lloyd(pattern2, y1(:,end), [t1(end) 2*patternTime], par);
-zeroMass{2} = zm2;
+    disp('Computing pattern 3 ...')
+    pattern3 = simpleMassDistribution(2,   3.0e8, 0.1, [0.5 0.5], 1);
+    [t3,s3,dens3,zm3] = Lloyd(pattern3, s2(:,end), [t2(end) 3*patternTime], par);
+    zeroMass{3} = zm3;
 
-disp('Computing pattern 3 ...')
-pattern3 = simpleMassDistribution(2,   3.0e8, 0.1, [0.5 0.5], 1);
-[t3,y3,dens3,zm3] = Lloyd(pattern3, y2(:,end), [t2(end) 3*patternTime], par);
-zeroMass{3} = zm3;
+    disp('Computing pattern 4 ...')
+    pattern4 = simpleMassDistribution(0);
+    [t4,s4,dens4,zm4] = Lloyd(pattern4, s3(:,end), [t3(end) 4*patternTime], par);
+    zeroMass{4} = zm4;
 
-disp('Computing pattern 4 ...')
-pattern4 = simpleMassDistribution(0);
-[t4,y4,dens4,zm4] = Lloyd(pattern4, y3(:,end), [t3(end) 4*patternTime], par);
-zeroMass{4} = zm4;
+    disp('Computing pattern 5 ...')
+    pattern5 = imageMassDensity('stars.mat');
+    [t5,s5,dens5,zm5] = Lloyd(pattern5, s4(:,end), [t4(end) 5*patternTime], par);
+    zeroMass{5} = zm5;
 
-disp('Computing pattern 5 ...')
-pattern5 = simpleMassDistribution(2, [1.0e10; 1.0e10], [0.1; 0.1], [0.7 0.7; 0.3 0.3], [1; 1]);
-[t5,y5,dens5,zm5] = Lloyd(pattern5, y4(:,end), [t4(end) 5*patternTime], par);
-zeroMass{5} = zm5;
+    % combine
+    t = [t1(1:end-1) t2(1:end-1) t3(1:end-1) t4(1:end-1) t5];
+    s = [s1(:,1:end-1) s2(:,1:end-1) s3(:,1:end-1) s4(:,1:end-1) s5];
 
-% combine
-t = [t1(1:end-1) t2(1:end-1) t3(1:end-1) t4(1:end-1) t5];
-y = [y1(:,1:end-1) y2(:,1:end-1) y3(:,1:end-1) y4(:,1:end-1) y5];
+    save('main.mat','t1','s1','t2','s2','t3','s3','t4','s4','t5','s5','zeroMass')
+elseif quick == false
+    
+    load('main.mat');
+    disp('Computing pattern 5 ...')
+    pattern5 = imageMassDensity('stars.mat',2);
+    [t5,s5,dens5,zm5] = Lloyd(pattern5, s0, [0 patternTime], par);
+    zeroMass{5} = zm5;
+    
+    % combine
+%     t = [t1(1:end-1) t2(1:end-1) t3(1:end-1) t4(1:end-1) t5];
+%     s = [s1(:,1:end-1) s2(:,1:end-1) s3(:,1:end-1) s4(:,1:end-1) s5];
+    t = t5;
+    s = s5;
+else
+    disp('Computing pattern 1 ...')
+    pattern1 = imageMassDensity('stars.mat',1);
+    [t1,s1,dens1,zm1] = Lloyd(pattern1, s0, [0 5*patternTime], par);
+    zeroMass{1} = zm1;
+    
+    % combine
+    t = [t1(1:end-1)];
+    s = [s1(:,1:end-1)];
+    
+end
+
+disp('Finished simulation')
+
 
 %% Visualisation
+x = s(1:N,:);
+y = s(N+1:2*N,:);
+
 %% animate robot trajectories
 if options.animation
     disp('Preparing animation')
-    animate(t,y,par,options, zeroMass);
+    animate(t,[x;y],par,options, zeroMass);
 end
 
-%% plot Voronoi diagrams
+%% plot Voronoi 
 if options.plot
     disp('Preparing Voronoi diagrams:')
     disp('    initial state')
-    xinit = y(1:N,1);
-    yinit = y(N+1:2*N,1);
+    xinit = x(:,1);
+    yinit = y(:,1);
     xinit = [xinit; -xinit; 2-xinit; xinit; xinit];
     yinit = [yinit; yinit; yinit; -yinit; 2-yinit];
     figure; plotVoronoi(xinit,yinit,options);
@@ -92,8 +139,8 @@ if options.plot
     axis([xlb xub ylb yub]);
     
     disp('    final state')
-    xfinal = y(1:N,end);
-    yfinal = y(N+1:2*N,end);
+    xfinal = x(:,end);
+    yfinal = y(:,end);
     xfinal = [xfinal; -xfinal; 2-xfinal; xfinal; xfinal];
     yfinal = [yfinal; yfinal; yfinal; -yfinal; 2-yfinal];
     figure; plotVoronoi(xfinal,yfinal,options);
@@ -101,9 +148,9 @@ if options.plot
     % plot agent trajectories
     hold on;
     for i = 1:N
-        plot(y(i,end), y(i+N,end), 'sk', 'LineWidth', lw, 'MarkerSize', ms);
+        plot(x(i,end), y(i,end), 'sk', 'LineWidth', lw, 'MarkerSize', ms);
         hold on;
-        plot(y(i,:), y(i+N,:), '--k', 'LineWidth', lw, 'MarkerSize', ms);
+        plot(x(i,:), y(i,:), '--k', 'LineWidth', lw, 'MarkerSize', ms);
     end
     axis equal;
     axis([xlb xub ylb yub]);
