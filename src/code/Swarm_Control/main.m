@@ -30,7 +30,7 @@ par = struct('boundary', [0 0;0 1;1 1;1 0],...   % field boundary
              'res',         10,...       % centroid calulation resolution
              'dt',          0.1,...      % time step [s]
              'diffDrive',   true ,...    % Holonomic dynamcis (false) vs. differential Drive dynamics (true)
-             'krho',        1,...      % Distance gain
+             'krho',        1,...        % Distance gain
              'kalpha',      1,...        % Gain on alpha
              'useConstantSpeed', true,...% Constant speed true/false
              'constantSpeed', 0.1);        % Desired constant speed
@@ -49,8 +49,7 @@ rng('shuffle', 'twister');
 if(par.diffDrive == false)
     s0 = rand(2*N,1); % x, y
 else
-    s0 = rand(3*N,1); % x, y, phi 
-%     s0(3:3:3*N) = s0(3:3:3*N)*2*pi;
+    s0 = [rand(2*N,1);rand(N,1)*2*pi]; % x, y, phi 
 end
 
 %% Pattern control
@@ -93,7 +92,7 @@ elseif quick == false
     load('main.mat');
     disp('Computing pattern 5 ...')
     pattern5 = imageMassDensity('stars.mat',2);
-    [t5,s5,dens5,zm5] = Lloyd(pattern5, s0, [0 patternTime], par);
+    [t5,s5,dens5,zm5] = Lloyd(pattern5, s0, [0 2*patternTime], par);
     zeroMass{5} = zm5;
     
     % combine
@@ -103,7 +102,7 @@ elseif quick == false
     s = s5;
 else
     disp('Computing pattern 1 ...')
-    pattern1 = imageMassDensity('stars.mat',1);
+    pattern1 = imageMassDensity('stars.mat',2);
     [t1,s1,dens1,zm1] = Lloyd(pattern1, s0, [0 5*patternTime], par);
     zeroMass{1} = zm1;
     
