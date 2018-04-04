@@ -1,0 +1,13 @@
+function [check,new_pose]=check_initial_position(old_pos,par)
+
+    for ii=1:size(old_pos,1)
+        start_in_obstacle=inObstacle(old_pos(ii),old_pos(par.N+ii), par);
+        if start_in_obstacle==true;
+            %just change x coordinate if in obstacle
+            old_pos(ii)=rand(1);
+            check=false;
+        else
+            check=true
+        end
+    end
+end

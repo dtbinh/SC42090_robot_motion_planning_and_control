@@ -10,6 +10,6 @@ end
 
 for ii = 1:par.nObstacles
     if(inpolygon(x,y,par.obstacles{ii}(:,1),par.obstacles{ii}(:,2)))
-        res = true;
+        res = true;        
     end
 end
