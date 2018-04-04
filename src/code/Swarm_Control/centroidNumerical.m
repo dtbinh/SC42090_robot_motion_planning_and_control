@@ -32,7 +32,7 @@ for x = xmin+xstep/2:xstep:xmax-xstep/2
         q = [x; y];
         phiFcn(i, 1:2) = q';
         if inpolygon(q(1), q(2), V(:,1), V(:,2))
-            phiq = massFcn(q(1),q(2));
+            phiq = getDens(x,y,massFcn, par); % Changed
             Mv = Mv + phiq; % TODO
             Lv = Lv + q*phiq; % TODO
             phiFcn(i, 3) = phiq;

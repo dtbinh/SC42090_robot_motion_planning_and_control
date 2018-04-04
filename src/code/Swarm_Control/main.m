@@ -52,6 +52,21 @@ else
     s0 = [rand(2*N,1);rand(N,1)*2*pi]; % x, y, phi 
 end
 
+% define obstacles through points of the polygon
+% obstacle 1 (rectangle)
+par.obstacles{1}=  [0.6,    0.35;
+                    0.6,    0.2;
+                    0.7,    0.2;
+                    0.7,    0.35];
+% obstacle 2 (triangle)
+par.obstacles{2}=  [0.1,    0.6;
+                    0.1,    0.3;
+                    0.4,    0.5];
+                
+par.nObstacles  = 2;
+par.obstaclesOn = true;
+
+
 %% Pattern control
 quick = false;
 if(exist('main.mat')==0 && quick==false)
@@ -162,9 +177,12 @@ pattern = pattern5; dens = dens5;
 densDistribution = zeros(size(xCoord));
 for i = 1:size(xCoord,1)
     for j = 1:size(xCoord,2)
-        densDistribution(i,j) = pattern(xCoord(i,j), yCoord(i,j));
+        densDistribution(i,j) = getDens(xCoord(i,j), yCoord(i,j), pattern, par); % pattern(xCoord(i,j), yCoord(i,j));
     end
 end
+%imagesc(flipud(densDistribution)); axis square
+% print -depsc2 figures/paths_obstacles_dist.eps
+
 % normalize
 maxMag = max(max(max(densDistribution)));
 densDistribution = 1/maxMag*densDistribution;
