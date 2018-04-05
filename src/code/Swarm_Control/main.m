@@ -57,6 +57,10 @@ par.obstacles{2}=  [0.1,    0.6;
                     0.4,    0.5;
                     0.1,    0.6;];
                 
+par.polys_obstacle1 = polyshape([par.obstacles{1}(:,1)]',[par.obstacles{1}(:,2)]');
+par.polys_obstacle2 = polyshape([par.obstacles{2}(:,1)]',[par.obstacles{2}(:,2)]');
+
+
 par.nObstacles  = 2;
 par.obstaclesOn = true;
 
@@ -137,7 +141,7 @@ elseif quick == false
     
     load('main.mat');
     disp('Computing pattern 5 ...')
-    pattern5 = imageMassDensity('stars.mat',1);
+    pattern5 = imageMassDensity('stars.mat',3);
     [t5,s5,dens5,zm5] = Lloyd(pattern5, s0, [0 2*patternTime], par);
     zeroMass{5} = zm5;
     

@@ -29,7 +29,7 @@ D = sqrt(D(:,1).^2 + D(:,2).^2);
 P = P0(I(2:n+1),:);
 N = I(2:n+1); % indices of neighbors in P0
 
-
+in_obstacle=false;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Incremental Voronoi Comp
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -83,8 +83,27 @@ while i<=n && (2*d>D(i) || LSize>VSize)
     I = I(1:LSize);
     Lines = Lines(I,:);
     NI = NI(I); % filter out indices of non-Voronoi Neighbors 
-    % Max distance point in V0
-    d = max(sqrt((V0(:,1)-p0(1)).^2 + (V0(:,2)-p0(2)).^2));
+    % if new polygon intersect with polygon of obstacle, set distance to
+    % high value
+    
+    % create polygon with current Voronoi region
+    polyV0=polyshape(V0(:,1),V0(:,2));
+    
+    % check if Voronoi region interesects with obstacle polygon
+    polyout1 = intersect(polyV0,par.polys_obstacle1);
+    polyout2 = intersect(polyV0,par.polys_obstacle2);
+
+    % if intersection with obstacle occurse penaltize the cost for the
+    % distance with high value
+    if ~isempty(polyout1) || ~isempty(polyout2)
+        intersectobstacle=true;
+    end
+    if intersectobstacle=true;
+        d=100;
+    else
+        % Max distance point in V0
+        d = max(sqrt((V0(:,1)-p0(1)).^2 + (V0(:,2)-p0(2)).^2));
+    end
     % Increment
     i = i+1;
 end
