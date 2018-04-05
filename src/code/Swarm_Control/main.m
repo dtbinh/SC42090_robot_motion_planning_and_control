@@ -71,19 +71,7 @@ else
 end
 
 
-% define obstacles through points of the polygon
-% obstacle 1 (rectangle)
-par.obstacles{1}=  [0.6,    0.35;
-                    0.6,    0.2;
-                    0.7,    0.2;
-                    0.7,    0.35;
-                    0.6,    0.35;];
-% obstacle 2 (triangle)
-par.obstacles{2}=  [0.1,    0.6;
-                    0.1,    0.3;
-                    0.4,    0.5;
-                    0.1,    0.6;];
-                
+               
 par.nObstacles  = 2;
 par.obstaclesOn = true;
 
