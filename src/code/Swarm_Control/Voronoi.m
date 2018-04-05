@@ -92,12 +92,18 @@ while i<=n && (2*d>D(i) || LSize>VSize)
     % check if Voronoi region interesects with obstacle polygon
     polyout1 = intersect(polyV0,par.polys_obstacle1);
     polyout2 = intersect(polyV0,par.polys_obstacle2);
-
+    
+    %check if one vertices of Voronoi region lies within 
+    for ii=1:size(V0,1)
+        intersectobstacle=inObstacle(V0(ii,1),V0(ii,2),par);
+    end
+    
     % if intersection with obstacle occurse penaltize the cost for the
     % distance with high value
     if ~isempty(polyout1) || ~isempty(polyout2)
         intersectobstacle=true;
     end
+    
     if intersectobstacle=true;
         d=100;
     else
