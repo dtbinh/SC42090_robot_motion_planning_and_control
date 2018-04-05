@@ -29,6 +29,8 @@ y = zeros(size(y0,1),length(t));
 densityField = zeros(par.res^2,3,N,length(t));
 posZeroM = [];
 for ti = 1:length(t)
+    ti
+    length(t)
     y(:,ti) = positions(:);
     inputs = zeros(N,2);
     

@@ -87,8 +87,9 @@ while i<=n && (2*d>D(i) || LSize>VSize)
     % high value
     
     % create polygon with current Voronoi region
-    polyV0=polyshape(V0(:,1),V0(:,2));
-    
+    polyV0=polyshape(V0(:,1),V0(:,2), 'Simplify', false);
+%     plot(polyV0.con);
+    polyV0 = polyV0.convhull;
     % check if Voronoi region interesects with obstacle polygon
     polyout1 = intersect(polyV0,par.polys_obstacle1);
     polyout2 = intersect(polyV0,par.polys_obstacle2);
