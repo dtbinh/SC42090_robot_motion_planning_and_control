@@ -104,7 +104,7 @@ while i<=n && (2*d>D(i) || LSize>VSize)
         intersectobstacle=true;
     end
     
-    if intersectobstacle=true;
+    if intersectobstacle==true;
         d=100;
     else
         % Max distance point in V0

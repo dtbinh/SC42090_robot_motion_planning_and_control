@@ -45,6 +45,19 @@ ylb = min(par.boundary(:,2));
 yub = max(par.boundary(:,2));
 
 % define obstacles through points of the polygon
+par.obstacles{1}=  [0.6,    0.35;
+                    0.6,    0.2;
+                    0.7,    0.2;
+                    0.7,    0.35];
+% obstacle 2 (triangle)
+par.obstacles{2}=  [0.1,    0.6;
+                    0.1,    0.3;
+                    0.4,    0.5];
+
+                
+par.polys_obstacle1 = polyshape([par.obstacles{1}(:,1)]',[par.obstacles{1}(:,2)]');
+par.polys_obstacle2 = polyshape([par.obstacles{2}(:,1)]',[par.obstacles{2}(:,2)]');
+
 % obstacle 1 (rectangle)
 par.obstacles{1}=  [0.6,    0.35;
                     0.6,    0.2;
@@ -57,10 +70,6 @@ par.obstacles{2}=  [0.1,    0.6;
                     0.4,    0.5;
                     0.1,    0.6;];
                 
-par.polys_obstacle1 = polyshape([par.obstacles{1}(:,1)]',[par.obstacles{1}(:,2)]');
-par.polys_obstacle2 = polyshape([par.obstacles{2}(:,1)]',[par.obstacles{2}(:,2)]');
-
-
 par.nObstacles  = 2;
 par.obstaclesOn = true;
 
